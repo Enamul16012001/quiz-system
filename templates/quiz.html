@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - {{ department }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        
+        .info-item span {
+            margin-left: 8px;
+        }
+        
+        .quiz-content {
+            padding: 30px;
+        }
+        
+        .progress-bar {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .question-container:hover {
+            border-color: #667eea;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.5;
+            flex: 1;
+        }
+        
+        .options {
+            margin-left: 50px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background: #f8f9ff;
+            border-color: #667eea;
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+        
+        .option label {
+            cursor: pointer;
+            font-size: 1rem;
+            color: #333;
+            flex: 1;
+        }
+        
+        .submit-section {
+            text-align: center;
+            padding: 30px;
+            border-top: 2px solid #f0f0f0;
+            background: #f8f9ff;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .info {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .quiz-content {
+                padding: 20px;
+            }
+            
+            .options {
+                margin-left: 0;
+            }
+            
+            .question-container {
+                padding: 20px;
+            }
+            
+            .timer {
+                position: static;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">
+        ⏰ Time: <span id="timeDisplay">00:00</span>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📝 {{ department }} Quiz</h1>
+            <div class="info">
+                <div class="info-item">
+                    <span>👤</span>
+                    <span><strong>Name:</strong> {{ name }}</span>
+                </div>
+                <div class="info-item">
+                    <span>🆔</span>
+                    <span><strong>ID:</strong> {{ user_id }}</span>
+                </div>
+                <div class="info-item">
+                    <span>📊</span>
+                    <span><strong>Questions:</strong> {{ quiz_data.questions|length }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <form method="POST" action="/submit-quiz" id="quizForm">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                <input type="hidden" name="time_taken" id="timeTakenInput" value="00:00">
+                
+                {% for question in quiz_data.questions %}
+                <div class="question-container">
+                    <div class="question-header">
+                        <div class="question-number">{{ question.id }}</div>
+                        <div class="question-text">{{ question.question }}</div>
+                    </div>
+                    
+                    <div class="options">
+                        {% for option in question.options %}
+                        <div class="option" onclick="selectOption(this)">
+                            <input type="radio" 
+                                   name="question_{{ question.id }}" 
+                                   value="{{ loop.index0 }}" 
+                                   id="q{{ question.id }}_{{ loop.index0 }}">
+                            <label for="q{{ question.id }}_{{ loop.index0 }}">
+                                <strong>{{ ['A', 'B', 'C', 'D'][loop.index0] }})</strong> {{ option }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="submit-section">
+                    <button type="submit" class="btn" onclick="return confirmSubmit()">
+                        🎯 Submit Quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let startTime = new Date();
+        let totalQuestions = {{ quiz_data.questions|length }};
+        
+        // Timer functionality
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('timeTakenInput').value = timeString;
+        }
+        
+        setInterval(updateTimer, 1000);
+        
+        // Progress bar functionality
+        function updateProgress() {
+            const checkedInputs = document.querySelectorAll('input[type="radio"]:checked');
+            const progress = (checkedInputs.length / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        // Option selection
+        function selectOption(optionDiv) {
+            const radio = optionDiv.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            // Remove selection from other options in the same question
+            const questionContainer = optionDiv.closest('.question-container');
+            const allOptions = questionContainer.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to current option
+            optionDiv.classList.add('selected');
+            
+            updateProgress();
+        }
+        
+        // Add event listeners to radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', updateProgress);
+        });
+        
+        // Confirmation before submit
+        function confirmSubmit() {
+            const checkedInputs = document.querySelectorAll('input[type="radio"]:checked');
+            const answeredQuestions = checkedInputs.length;
+            
+            if (answeredQuestions < totalQuestions) {
+                const unanswered = totalQuestions - answeredQuestions;
+                return confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit?`);
+            }
+            
+            return confirm('Are you sure you want to submit your quiz? This action cannot be undone.');
+        }
+        
+        // Auto-save functionality (optional)
+        function autoSave() {
+            const formData = new FormData(document.getElementById('quizForm'));
+            const answers = {};
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('question_')) {
+                    answers[key] = value;
+                }
+            }
+            localStorage.setItem('quiz_answers_{{ session_id }}', JSON.stringify(answers));
+        }
+        
+        // Load saved answers
+        function loadSavedAnswers() {
+            const saved = localStorage.getItem('quiz_answers_{{ session_id }}');
+            if (saved) {
+                const answers = JSON.parse(saved);
+                for (let [key, value] of Object.entries(answers)) {
+                    const radio = document.querySelector(`input[name="${key}"][value="${value}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        radio.closest('.option').classList.add('selected');
+                    }
+                }
+                updateProgress();
+            }
+        }
+        
+        // Add auto-save on answer change
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', autoSave);
+        });
+        
+        // Load saved answers on page load
+        loadSavedAnswers();
+        
+        // Prevent accidental page refresh
+        window.addEventListener('beforeunload', function(e) {
+            const checkedInputs = document.querySelectorAll('input[type="radio"]:checked');
+            if (checkedInputs.length > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+        
+        // Add CSS for selected options
+        const style = document.createElement('style');
+        style.textContent = `
+            .option.selected {
+                background: #f0f9ff !important;
+                border-color: #667eea !important;
+                transform: translateX(5px);
+            }
+        `;
+        document.head.appendChild(style);

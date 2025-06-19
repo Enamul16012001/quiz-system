@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quiz Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9ff;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .results-table th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .results-table td {
+            color: #555;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .performance-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .performance-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .performance-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .performance-average {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .performance-poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .score-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .score-excellent {
+            background: #10b981;
+        }
+        
+        .score-good {
+            background: #3b82f6;
+        }
+        
+        .score-average {
+            background: #f59e0b;
+        }
+        
+        .score-poor {
+            background: #ef4444;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 2px;
+        }
+        
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .refresh-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .results-table {
+                font-size: 0.85rem;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🔧 Admin Dashboard</h1>
+            <div style="display: flex; gap: 10px;">
+                <a href="/" class="nav-link">🏠 Back to Quiz</a>
+                <a href="/admin/logout" class="nav-link" style="background: rgba(255,255,255,0.2);">🚪 Logout</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Database Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ db_info.total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ db_info.total_quiz_sessions }}</div>
+                <div class="stat-label">Quiz Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ db_info.database_size_mb }}</div>
+                <div class="stat-label">DB Size (MB)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ results|length }}</div>
+                <div class="stat-label">Recent Results</div>
+            </div>
+        </div>
+        
+        <!-- Quiz Results Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Recent Quiz Results</h2>
+            </div>
+            
+            <!-- Filters -->
+            <div style="padding: 20px 25px; background: #f8f9ff; border-bottom: 1px solid #e1e5e9;">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="departmentFilter">Department</label>
+                        <select id="departmentFilter" onchange="filterResults()">
+                            <option value="">All Departments</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Software Engineering">Software Engineering</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Customer Service">Customer Service</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Project Management">Project Management</option>
+                            <option value="Quality Assurance">Quality Assurance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="performanceFilter">Performance</label>
+                        <select id="performanceFilter" onchange="filterResults()">
+                            <option value="">All Performance</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="userSearch">Search User</label>
+                        <input type="text" id="userSearch" placeholder="Name or ID" onkeyup="filterResults()">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button class="refresh-btn" onclick="testAPI()" style="background: #f59e0b;">🔧 Test API</button>
+                    </div>
+                </div>
+            </div>
+            
+            {% if results %}
+            <div class="table-container">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Department</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Performance</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr data-department="{{ result.department }}" 
+                            data-performance="{{ result.performance_level }}"
+                            data-user="{{ result.name.lower() }} {{ result.user_id.lower() }}"
+                            data-session-id="{{ result.session_id }}">
+                            <td>
+                                <div>
+                                    <strong>{{ result.name }}</strong><br>
+                                    <small style="color: #666;">ID: {{ result.user_id }}</small>
+                                </div>
+                            </td>
+                            <td>{{ result.department }}</td>
+                            <td>
+                                <div class="score-circle {% if result.percentage >= 80 %}score-excellent{% elif result.percentage >= 60 %}score-good{% elif result.percentage >= 40 %}score-average{% else %}score-poor{% endif %}">
+                                    {{ result.score }}/{{ result.total_questions }}
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ "%.1f"|format(result.percentage) }}%</strong>
+                            </td>
+                            <td>
+                                <span class="performance-badge performance-{{ result.performance_level.lower() }}">
+                                    {{ result.performance_level }}
+                                </span>
+                            </td>
+                            <td>
+                                <div>
+                                    {{ result.created_at.split(' ')[0] }}<br>
+                                    <small style="color: #666;">{{ result.created_at.split(' ')[1].split('.')[0] }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="action-btn btn-view" onclick="viewDetails('{{ result.session_id }}')">
+                                    👁️ View
+                                </button>
+                                <button class="action-btn btn-delete" onclick="deleteSession('{{ result.session_id }}')">
+                                    🗑️ Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-data">
+                <p>📭 No quiz results found</p>
+                <p>Quiz results will appear here once users start taking quizzes.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function filterResults() {
+            const departmentFilter = document.getElementById('departmentFilter').value.toLowerCase();
+            const performanceFilter = document.getElementById('performanceFilter').value.toLowerCase();
+            const userSearch = document.getElementById('userSearch').value.toLowerCase();
+            
+            const table = document.getElementById('resultsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const department = row.getAttribute('data-department').toLowerCase();
+                const performance = row.getAttribute('data-performance').toLowerCase();
+                const user = row.getAttribute('data-user');
+                
+                let showRow = true;
+                
+                // Filter by department
+                if (departmentFilter && !department.includes(departmentFilter)) {
+                    showRow = false;
+                }
+                
+                // Filter by performance
+                if (performanceFilter && !performance.includes(performanceFilter)) {
+                    showRow = false;
+                }
+                
+                // Filter by user search
+                if (userSearch && !user.includes(userSearch)) {
+                    showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            }
+        }
+        
+        async function viewDetails(sessionId) {
+            try {
+                const response = await fetch(`/api/quiz-details/${sessionId}`, {
+                    method: 'GET',
+                    credentials: 'include',  // Include cookies for authentication
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.status === 401) {
+                    alert('Session expired. Please login again.');
+                    window.location.href = '/admin/login';
+                    return;
+                }
+                
+                if (response.ok) {
+                    const details = await response.json();
+                    
+                    // Create a detailed view window or redirect to details page
+                    let detailsHtml = `
+                        <h3>Quiz Details for ${details.name}</h3>
+                        <p><strong>Department:</strong> ${details.department}</p>
+                        <p><strong>Score:</strong> ${details.score}/${details.total_questions} (${details.percentage.toFixed(1)}%)</p>
+                        <p><strong>Date:</strong> ${details.created_at}</p>
+                        <hr>
+                        <h4>Questions & Answers:</h4>
+                    `;
+                    
+                    details.questions.forEach((q, index) => {
+                        const isCorrect = q.is_correct ? '✅' : '❌';
+                        const userAnswer = q.user_answer !== null ? q.options[q.user_answer] : 'No answer';
+                        const correctAnswer = q.options[q.correct_answer];
+                        
+                        detailsHtml += `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <p><strong>Q${index + 1}:</strong> ${q.question_text}</p>
+                                <p><strong>Your Answer:</strong> ${userAnswer} ${isCorrect}</p>
+                                ${!q.is_correct ? `<p><strong>Correct Answer:</strong> ${correctAnswer}</p>` : ''}
+                                ${q.explanation ? `<p><strong>Explanation:</strong> ${q.explanation}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>Quiz Details - ${details.name}</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+                                    h3 { color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+                                    .correct { background: #f0fdf4; border-left: 4px solid #10b981; }
+                                    .incorrect { background: #fef2f2; border-left: 4px solid #ef4444; }
+                                </style>
+                            </head>
+                            <body>
+                                ${detailsHtml}
+                                <br><button onclick="window.print()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Print</button>
+                            </body>
+                        </html>
+                    `);
+                } else {
+                    const errorData = await response.json();
+                    alert('Failed to load quiz details: ' + (errorData.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading quiz details:', error);
+                alert('Error loading quiz details: ' + error.message);
+            }
+        }
+        
+        async function deleteSession(sessionId) {
+            if (confirm('Are you sure you want to delete this quiz session? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/api/quiz-session/${sessionId}`, {
+                        method: 'DELETE',
+                        credentials: 'include',  // Include cookies for authentication
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.status === 401) {
+                        alert('Session expired. Please login again.');
+                        window.location.href = '/admin/login';
+                        return;
+                    }
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert('✅ Quiz session deleted successfully');
+                        
+                        // Remove the row from table instead of full page reload
+                        const row = document.querySelector(`tr[data-session-id="${sessionId}"]`);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s ease';
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+                        } else {
+                            location.reload(); // Fallback to full reload
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert('❌ Failed to delete quiz session: ' + (errorData.detail || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Error deleting quiz session:', error);
+                    alert('❌ Error deleting quiz session: ' + error.message);
+                }
+            }
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            // Only refresh if no filters are active
+            const hasFilters = document.getElementById('departmentFilter').value ||
+                              document.getElementById('performanceFilter').value ||
+                              document.getElementById('userSearch').value;
+            
+            if (!hasFilters) {
+                location.reload();
+            }
+        }, 30000);
+        
+        // Test API function for debugging
+        async function testAPI() {
+            console.log('Testing API endpoints...');
+            
+            try {
+                // Test basic API
+                const basicTest = await fetch('/api/test');
+                const basicResult = await basicTest.json();
+                console.log('Basic API test:', basicResult);
+                
+                // Test admin API
+                const adminTest = await fetch('/api/test-admin', {
+                    credentials: 'include'
+                });
+                const adminResult = await adminTest.json();
+                console.log('Admin API test:', adminResult);
+                
+                // Test getting all results
+                const resultsTest = await fetch('/api/all-results', {
+                    credentials: 'include'
+                });
+                const resultsResult = await resultsTest.json();
+                console.log('All results test:', resultsResult);
+                
+                alert(`✅ API Tests Complete!\n\nBasic API: ${basicResult.message}\nAdmin API: ${adminResult.message}\nResults Count: ${resultsResult.results.length}\n\nCheck console for details.`);
+                
+            } catch (error) {
+                console.error('API test error:', error);
+                alert(`❌ API Test Failed: ${error.message}\n\nCheck console for details.`);
+            }
+        }
+    </script>
+</body>
+</html>

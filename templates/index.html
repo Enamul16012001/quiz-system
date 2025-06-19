@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Department Quiz System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .custom-department {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+        
+        .info {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0369a1;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Job Department Quiz</h1>
+            <p>Test your knowledge and skills for your desired department</p>
+            <div style="margin-top: 15px;">
+                <a href="/admin/login" style="color: #0369a1; text-decoration: none; font-size: 0.9rem; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">
+                    🔧 Admin Login
+                </a>
+            </div>
+        </div>
+        
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="info">
+            <strong>Instructions:</strong>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Fill in your personal details</li>
+                <li>Select the department you want to apply for</li>
+                <li>Complete 10 multiple-choice questions</li>
+                <li>Get instant results and feedback</li>
+            </ul>
+        </div>
+        
+        <form method="POST" action="/start-quiz">
+            <div class="form-group">
+                <label for="name">👤 Full Name *</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+            </div>
+            
+            <div class="form-group">
+                <label for="user_id">🆔 Employee/Candidate ID *</label>
+                <input type="text" id="user_id" name="user_id" required placeholder="Enter your ID">
+            </div>
+            
+            <div class="form-group">
+                <label for="department">🏢 Department *</label>
+                <select id="department" name="department" required onchange="toggleCustomDepartment()">
+                    <option value="">Select a department</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                    <option value="custom">🔧 Other (Custom)</option>
+                </select>
+                
+                <div class="custom-department" id="customDepartmentDiv">
+                    <input type="text" id="custom_department" name="custom_department" 
+                           placeholder="Enter custom department name">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">🚀 Start Quiz</button>
+        </form>
+    </div>
+    
+    <script>
+        function toggleCustomDepartment() {
+            const departmentSelect = document.getElementById('department');
+            const customDiv = document.getElementById('customDepartmentDiv');
+            const customInput = document.getElementById('custom_department');
+            
+            if (departmentSelect.value === 'custom') {
+                customDiv.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customDiv.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
