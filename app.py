@@ -11,13 +11,12 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta
 
-from main import JobQuizSystem
+from main import JobQuizSystem, DEPARTMENTS  # Import DEPARTMENTS from main.py
 from db import db
 
 app = FastAPI(title="Job Department Quiz System")
 
-# Configure templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="templates", auto_reload=True)
 
 # Configuration
 API_KEY = "AIzaSyAsxe-O0Md2OuXAcYNxf7Czs0WB8dyBk7Y"  # Replace with your actual API key
@@ -33,13 +32,6 @@ admin_sessions = {}
 
 # Security
 security = HTTPBasic()
-
-# Predefined departments
-DEPARTMENTS = [
-    "Human Resources", "Marketing", "Software Engineering",
-    "Sales", "Finance", "Customer Service", "Operations",
-    "Data Science", "Project Management", "Quality Assurance"
-]
 
 class QuizSession(BaseModel):
     session_id: str
@@ -291,7 +283,8 @@ async def admin_dashboard(request: Request, session_id: str = Depends(verify_adm
     return templates.TemplateResponse("admin.html", {
         "request": request,
         "results": all_results,
-        "db_info": db_info
+        "db_info": db_info,
+        "departments": DEPARTMENTS
     })
 
 # Protect all admin API endpoints
@@ -338,6 +331,12 @@ async def delete_quiz_session(quiz_session_id: str, session_id: str = Depends(ve
     else:
         raise HTTPException(status_code=500, detail="Failed to delete quiz session")
 
+# Optional: API endpoint to get available departments
+@app.get("/api/departments")
+async def get_departments():
+    """Get list of available departments"""
+    return {"departments": DEPARTMENTS}
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=7902)

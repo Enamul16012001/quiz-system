@@ -310,7 +310,7 @@
         <div class="header-content">
             <h1>🔧 Admin Dashboard</h1>
             <div style="display: flex; gap: 10px;">
-                <a href="/" class="nav-link">🏠 Back to Quiz</a>
+                <a href="/" class="nav-link">🏠 Back to Quiz Home</a>
                 <a href="/admin/logout" class="nav-link" style="background: rgba(255,255,255,0.2);">🚪 Logout</a>
             </div>
         </div>
@@ -350,16 +350,9 @@
                         <label for="departmentFilter">Department</label>
                         <select id="departmentFilter" onchange="filterResults()">
                             <option value="">All Departments</option>
-                            <option value="Human Resources">Human Resources</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Software Engineering">Software Engineering</option>
-                            <option value="Sales">Sales</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Customer Service">Customer Service</option>
-                            <option value="Operations">Operations</option>
-                            <option value="Data Science">Data Science</option>
-                            <option value="Project Management">Project Management</option>
-                            <option value="Quality Assurance">Quality Assurance</option>
+                            {% for department in departments %}
+                            <option value="{{ department }}">{{ department }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     

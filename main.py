@@ -1,12 +1,32 @@
+# Add this at the top of your main.py file with other constants
+DEPARTMENTS = [
+    "Human Resources",
+    "Marketing", 
+    "Software Engineering",
+    "Sales",
+    "Finance",
+    "Customer Service",
+    "Operations",
+    "Data Science",
+    "Project Management",
+    "Machine Learning Engineer",
+    "Pharmaceutical"
+]
+
 import google.generativeai as genai
 import json
 import re
 from typing import Dict, List, Tuple, Optional
 
+
 class JobQuizSystem:
     def __init__(self, api_key: str):
         """Initialize the quiz system with Gemini API key"""
         genai.configure(api_key=api_key)
+        # Configure generation settings separately
+        self.generation_config = genai.types.GenerationConfig(
+            temperature=1.5
+        )
         self.model = genai.GenerativeModel('gemini-1.5-flash')
 
     def generate_quiz(self, department: str) -> Optional[Dict]:
@@ -50,7 +70,11 @@ class JobQuizSystem:
 
         try:
             print(f"🤖 Generating quiz for {department} using Gemini API...")
-            response = self.model.generate_content(prompt)
+            # Use generation_config instead of temperature parameter
+            response = self.model.generate_content(
+                prompt, 
+                generation_config=self.generation_config
+            )
 
             # Clean the response to extract JSON
             response_text = response.text.strip()
