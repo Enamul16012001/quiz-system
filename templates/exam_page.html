@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exam.title }} - In Progress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .exam-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .exam-meta {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .timer {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timer.warning {
+            background: rgba(239, 68, 68, 0.9);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .question-navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .nav-question {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .nav-question.answered {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .nav-question.current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .nav-question:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .question-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .question-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .question-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .question-meta-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .question-type {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .type-mcq {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .type-short {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .type-essay {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .question-marks {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .options-container {
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f9ff;
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 15px;
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 30px;
+        }
+        
+        .option-text {
+            flex: 1;
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .answer-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        .answer-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .answer-textarea.essay {
+            min-height: 250px;
+        }
+        
+        .question-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .save-indicator {
+            color: #10b981;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .save-indicator.show {
+            opacity: 1;
+        }
+        
+        .submit-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .submit-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .submit-section p {
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .character-count {
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .character-count.warning {
+            color: #f59e0b;
+        }
+        
+        .character-count.danger {
+            color: #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .timer {
+                font-size: 1rem;
+                padding: 10px 15px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .question-section {
+                padding: 20px;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-navigation {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <div class="exam-title">{{ exam.title }}</div>
+                <div class="exam-meta">{{ candidate_name }} ({{ candidate_id }})</div>
+            </div>
+            <div class="timer" id="examTimer">
+                <span>⏰</span>
+                <span id="timeDisplay">{{ exam.time_limit }}:00</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span>Progress: <span id="answeredCount">0</span> of {{ questions|length }} questions answered</span>
+                <span id="saveIndicator" class="save-indicator">✓ Auto-saved</span>
+            </div>
+            <div class="question-navigation" id="questionNav">
+                {% for question in questions %}
+                <div class="nav-question" data-question="{{ loop.index0 }}" onclick="goToQuestion({{ loop.index0 }})">
+                    {{ loop.index }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Question Section -->
+        <form method="POST" action="/exam/submit" id="examForm">
+            <input type="hidden" name="session_id" value="{{ session_id }}">
+            <input type="hidden" name="time_taken" id="timeTakenInput">
+            
+            {% for question in questions %}
+            <div class="question-section" id="question{{ loop.index0 }}" style="{% if loop.index0 != 0 %}display: none;{% endif %}">
+                <div class="question-header">
+                    <div class="question-number">{{ loop.index }}</div>
+                    <div class="question-info">
+                        <div class="question-title">Question {{ loop.index }} of {{ questions|length }}</div>
+                        <div class="question-meta-info">
+                            <span class="question-type type-{{ question.type }}">{{ question.type.upper() }}</span>
+                            <span class="question-marks">{{ question.marks }} marks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-text">{{ question.question }}</div>
+                
+                {% if question.type == 'mcq' %}
+                <div class="options-container">
+                    {% for option in question.options %}
+                    <div class="option" onclick="selectOption(this, {{ loop.index0 }})">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ loop.index0 }}" 
+                               id="q{{ question.id }}_{{ loop.index0 }}">
+                        <span class="option-label">{{ ['A', 'B', 'C', 'D'][loop.index0] }})</span>
+                        <span class="option-text">{{ option }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div>
+                    <textarea 
+                        name="question_{{ question.id }}" 
+                        class="answer-textarea {% if question.type == 'essay' %}essay{% endif %}"
+                        placeholder="Type your answer here..."
+                        onInput="updateCharacterCount(this, {{ loop.index0 }}); autoSave();"
+                        data-question="{{ loop.index0 }}"></textarea>
+                    <div class="character-count" id="charCount{{ loop.index0 }}">0 characters</div>
+                </div>
+                {% endif %}
+                
+                <div class="question-actions">
+                    <button type="button" class="btn btn-secondary" onclick="previousQuestion()" 
+                            {% if loop.index0 == 0 %}disabled{% endif %}>
+                        ← Previous
+                    </button>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        {% if loop.index0 == questions|length - 1 %}
+                        <button type="button" class="btn btn-success" onclick="showSubmitConfirmation()">
+                            🎯 Finish & Submit
+                        </button>
+                        {% else %}
+                        <button type="button" class="btn btn-primary" onclick="nextQuestion()">
+                            Next →
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Submit Section -->
+            <div class="submit-section" id="submitSection" style="display: none;">
+                <h3>🎯 Ready to Submit?</h3>
+                <p>Please review your answers before final submission. Once submitted, you cannot make any changes.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="hideSubmitConfirmation()">
+                        ← Review Answers
+                    </button>
+                    <button type="submit" class="btn btn-success" onclick="return confirmSubmit()">
+                        ✅ Submit Final Answers
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let currentQuestion = 0;
+        let totalQuestions = {{ questions|length }};
+        let timeLimit = {{ exam.time_limit }}; // minutes
+        let startTime = new Date();
+        let examTimer;
+        let autoSaveTimer;
+        
+        // Timer functionality
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = (timeLimit * 60) - elapsed;
+            
+            if (remaining <= 0) {
+                // Time's up - auto submit
+                alert('⏰ Time\'s up! The exam will be submitted automatically.');
+                submitExam();
+                return;
+            }
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('timeTakenInput').value = `${Math.floor(elapsed / 60).toString().padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`;
+            
+            // Warning when 5 minutes left
+            if (remaining <= 300) {
+                document.getElementById('examTimer').classList.add('warning');
+            }
+        }
+        
+        // Start timer
+        examTimer = setInterval(updateTimer, 1000);
+        updateTimer();
+        
+        // Question navigation
+        function goToQuestion(questionIndex) {
+            // Hide current question
+            document.getElementById(`question${currentQuestion}`).style.display = 'none';
+            
+            // Show target question
+            document.getElementById(`question${questionIndex}`).style.display = 'block';
+            
+            // Update navigation
+            updateQuestionNavigation(questionIndex);
+            
+            currentQuestion = questionIndex;
+            updateProgress();
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions - 1) {
+                goToQuestion(currentQuestion + 1);
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                goToQuestion(currentQuestion - 1);
+            }
+        }
+        
+        function updateQuestionNavigation(activeIndex) {
+            const navItems = document.querySelectorAll('.nav-question');
+            navItems.forEach((item, index) => {
+                item.classList.remove('current');
+                if (index === activeIndex) {
+                    item.classList.add('current');
+                }
+            });
+        }
+        
+        // Option selection for MCQ
+        function selectOption(optionDiv, optionValue) {
+            const radio = optionDiv.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            // Update visual selection
+            const questionContainer = optionDiv.closest('.question-section');
+            const allOptions = questionContainer.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+            optionDiv.classList.add('selected');
+            
+            updateProgress();
+            autoSave();
+        }
+        
+        // Progress tracking
+        function updateProgress() {
+            const formData = new FormData(document.getElementById('examForm'));
+            let answeredCount = 0;
+            
+            // Count answered questions
+            const questionInputs = document.querySelectorAll('input[name^="question_"], textarea[name^="question_"]');
+            const questionNames = new Set();
+            
+            questionInputs.forEach(input => {
+                questionNames.add(input.name);
+            });
+            
+            questionNames.forEach(name => {
+                const inputs = document.querySelectorAll(`[name="${name}"]`);
+                let hasAnswer = false;
+                
+                inputs.forEach(input => {
+                    if (input.type === 'radio' && input.checked) {
+                        hasAnswer = true;
+                    } else if (input.type !== 'radio' && input.value.trim()) {
+                        hasAnswer = true;
+                    }
+                });
+                
+                if (hasAnswer) answeredCount++;
+            });
+            
+            // Update progress bar
+            const percentage = (answeredCount / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('answeredCount').textContent = answeredCount;
+            
+            // Update question navigation
+            updateAnsweredStatus();
+        }
+        
+        function updateAnsweredStatus() {
+            const questionInputs = document.querySelectorAll('input[name^="question_"], textarea[name^="question_"]');
+            const questionNames = new Set();
+            const answeredQuestions = new Set();
+            
+            questionInputs.forEach(input => {
+                questionNames.add(input.name);
+            });
+            
+            questionNames.forEach(name => {
+                const inputs = document.querySelectorAll(`[name="${name}"]`);
+                let hasAnswer = false;
+                
+                inputs.forEach(input => {
+                    if (input.type === 'radio' && input.checked) {
+                        hasAnswer = true;
+                    } else if (input.type !== 'radio' && input.value.trim()) {
+                        hasAnswer = true;
+                    }
+                });
+                
+                if (hasAnswer) {
+                    // Extract question index from name
+                    const questionId = name.replace('question_', '');
+                    const questionElement = document.querySelector(`[name="${name}"]`);
+                    if (questionElement) {
+                        const questionIndex = parseInt(questionElement.getAttribute('data-question')) || 
+                                            Array.from(document.querySelectorAll('[name^="question_"]'))
+                                                .findIndex(el => el.name === name);
+                        if (questionIndex >= 0) {
+                            answeredQuestions.add(questionIndex);
+                        }
+                    }
+                }
+            });
+            
+            // Update navigation styling
+            const navItems = document.querySelectorAll('.nav-question');
+            navItems.forEach((item, index) => {
+                item.classList.remove('answered');
+                if (answeredQuestions.has(index)) {
+                    item.classList.add('answered');
+                }
+            });
+        }
+        
+        // Character count for text areas
+        function updateCharacterCount(textarea, questionIndex) {
+            const count = textarea.value.length;
+            const countElement = document.getElementById(`charCount${questionIndex}`);
+            
+            countElement.textContent = `${count} characters`;
+            
+            // Color coding based on length
+            if (count > 2000) {
+                countElement.className = 'character-count danger';
+            } else if (count > 1500) {
+                countElement.className = 'character-count warning';
+            } else {
+                countElement.className = 'character-count';
+            }
+        }
+        
+        // Auto-save functionality
+        function autoSave() {
+            const formData = new FormData(document.getElementById('examForm'));
+            const answers = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('question_')) {
+                    answers[key] = value;
+                }
+            }
+            
+            localStorage.setItem('exam_answers_{{ session_id }}', JSON.stringify(answers));
+            
+            // Show save indicator
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+        
+        // Load saved answers
+        function loadSavedAnswers() {
+            const saved = localStorage.getItem('exam_answers_{{ session_id }}');
+            if (saved) {
+                const answers = JSON.parse(saved);
+                for (let [key, value] of Object.entries(answers)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        if (input.type === 'radio') {
+                            const radioInput = document.querySelector(`[name="${key}"][value="${value}"]`);
+                            if (radioInput) {
+                                radioInput.checked = true;
+                                radioInput.closest('.option').classList.add('selected');
+                            }
+                        } else {
+                            input.value = value;
+                            // Update character count if it's a textarea
+                            const questionIndex = input.getAttribute('data-question');
+                            if (questionIndex !== null) {
+                                updateCharacterCount(input, questionIndex);
+                            }
+                        }
+                    }
+                }
+                updateProgress();
+            }
+        }
+        
+        // Submit confirmation
+        function showSubmitConfirmation() {
+            // Hide current question
+            document.getElementById(`question${currentQuestion}`).style.display = 'none';
+            
+            // Show submit section
+            document.getElementById('submitSection').style.display = 'block';
+            
+            // Update navigation to show we're at submit
+            const navItems = document.querySelectorAll('.nav-question');
+            navItems.forEach(item => item.classList.remove('current'));
+        }
+        
+        function hideSubmitConfirmation() {
+            // Hide submit section
+            document.getElementById('submitSection').style.display = 'none';
+            
+            // Show last question
+            goToQuestion(totalQuestions - 1);
+        }
+        
+        function confirmSubmit() {
+            const formData = new FormData(document.getElementById('examForm'));
+            let answeredCount = 0;
+            const questionNames = new Set();
+            
+            // Count answered questions
+            const questionInputs = document.querySelectorAll('input[name^="question_"], textarea[name^="question_"]');
+            questionInputs.forEach(input => {
+                questionNames.add(input.name);
+            });
+            
+            questionNames.forEach(name => {
+                const inputs = document.querySelectorAll(`[name="${name}"]`);
+                let hasAnswer = false;
+                
+                inputs.forEach(input => {
+                    if (input.type === 'radio' && input.checked) {
+                        hasAnswer = true;
+                    } else if (input.type !== 'radio' && input.value.trim()) {
+                        hasAnswer = true;
+                    }
+                });
+                
+                if (hasAnswer) answeredCount++;
+            });
+            
+            const unanswered = totalQuestions - answeredCount;
+            
+            let confirmMessage = '🎯 Are you sure you want to submit your exam?\n\n';
+            confirmMessage += `📊 Summary:\n`;
+            confirmMessage += `- Answered: ${answeredCount} questions\n`;
+            if (unanswered > 0) {
+                confirmMessage += `- Unanswered: ${unanswered} questions\n`;
+            }
+            confirmMessage += `\n⚠️ Once submitted, you cannot make any changes.\n\nProceed with submission?`;
+            
+            return confirm(confirmMessage);
+        }
+        
+        function submitExam() {
+            document.getElementById('examForm').submit();
+        }
+        
+        // Prevent accidental navigation
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your exam progress will be lost.';
+        });
+        
+        // Disable right-click and some keyboard shortcuts
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+U, etc.
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+                (e.ctrlKey && e.keyCode === 85) ||
+                (e.ctrlKey && e.keyCode === 83)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Add auto-save listeners
+        document.addEventListener('change', autoSave);
+        document.addEventListener('input', debounce(autoSave, 1000));
+        
+        // Debounce function for auto-save
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('submitSection').style.display !== 'block') {
+                if (e.key === 'ArrowRight' && currentQuestion < totalQuestions - 1) {
+                    nextQuestion();
+                } else if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+                    previousQuestion();
+                }
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedAnswers();
+            updateQuestionNavigation(0);
+            updateProgress();
+            
+            // Focus on first input
+            const firstInput = document.querySelector('#question0 input, #question0 textarea');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
+        
+        // Cleanup on form submit
+        document.getElementById('examForm').addEventListener('submit', function() {
+            clearInterval(examTimer);
+            localStorage.removeItem('exam_answers_{{ session_id }}');
+            
+            // Show loading state
+            const submitButtons = document.querySelectorAll('button[type="submit"]');
+            submitButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.textContent = '🔄 Submitting...';
+            });
+        });
+        
+        // Visibility change handling (tab switching detection)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('⚠️ Tab switched - this may be logged for security');
+                // Could implement tab switching detection here
+            }
+        });
+        
+        // Fullscreen recommendation (optional)
+        function requestFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+        
+        // Optional: Suggest fullscreen mode
+        setTimeout(() => {
+            if (confirm('📺 Would you like to enter fullscreen mode for better focus?')) {
+                requestFullscreen();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

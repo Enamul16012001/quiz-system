@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Exam - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: #f8f9ff;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .form-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .form-content {
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .input-group .form-group {
+            margin-bottom: 0;
+        }
+        
+        .marks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .question-type-card {
+            background: #f8f9ff;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .question-type-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .question-type-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .question-type-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .info {
+            background: #f0f9ff;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .form-actions {
+            padding: 25px 30px;
+            background: #f8f9ff;
+            border-top: 2px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-content {
+                padding: 20px;
+            }
+            
+            .form-grid,
+            .marks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📝 Create New Exam</h1>
+            <a href="/admin" class="nav-link">← Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Set Up New Examination</h2>
+                <p>Configure your exam details, question structure, and evaluation criteria. AI will help generate relevant questions based on your specifications.</p>
+            </div>
+            
+            {% if error %}
+            <div style="padding: 20px;">
+                <div class="error">
+                    <strong>❌ Error:</strong> {{ error }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/admin/create-exam" id="examForm" enctype="application/x-www-form-urlencoded">
+                <div class="form-content">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📋 Basic Information
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="title">📝 Exam Title *</label>
+                                <input type="text" id="title" name="title" required 
+                                       placeholder="e.g., Software Engineer Technical Assessment"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="department">🏢 Department *</label>
+                                <input type="text" id="department" name="department" required 
+                                       placeholder="e.g., Information Technology"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="position">👤 Position/Job Title *</label>
+                                <input type="text" id="position" name="position" required 
+                                       placeholder="e.g., Senior Software Engineer"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="time_limit">⏰ Time Limit (minutes) *</label>
+                                <input type="number" id="time_limit" name="time_limit" required 
+                                       min="30" max="300" value="120">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">📄 Exam Description</label>
+                            <textarea id="description" name="description" rows="3" 
+                                    placeholder="Brief description of the exam purpose and scope..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Question Structure -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            🧩 Question Structure
+                        </h3>
+                        
+                        <div class="info">
+                            <strong>💡 Note:</strong> Define how many questions of each type you want. AI will generate relevant questions based on the department and position.
+                        </div>
+                        
+                        <div class="marks-grid">
+                            <div class="question-type-card">
+                                <div class="question-type-icon">☑️</div>
+                                <div class="question-type-title">Multiple Choice Questions</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="mcq_count">Count</label>
+                                        <input type="number" id="mcq_count" name="mcq_count" 
+                                               min="0" max="50" value="10" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mcq_marks">Marks Each</label>
+                                        <input type="number" id="mcq_marks" name="mcq_marks" 
+                                               min="1" max="10" value="2" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="question-type-card">
+                                <div class="question-type-icon">✍️</div>
+                                <div class="question-type-title">Short Answer Questions</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="short_count">Count</label>
+                                        <input type="number" id="short_count" name="short_count" 
+                                               min="0" max="20" value="5" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="short_marks">Marks Each</label>
+                                        <input type="number" id="short_marks" name="short_marks" 
+                                               min="1" max="20" value="5" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="question-type-card">
+                                <div class="question-type-icon">📝</div>
+                                <div class="question-type-title">Essay Questions</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label for="essay_count">Count</label>
+                                        <input type="number" id="essay_count" name="essay_count" 
+                                               min="0" max="10" value="2" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="essay_marks">Marks Each</label>
+                                        <input type="number" id="essay_marks" name="essay_marks" 
+                                               min="1" max="50" value="15" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; text-align: center;">
+                                <strong>📊 Total Questions: <span id="totalQuestions">17</span> | Total Marks: <span id="totalMarks">75</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instructions -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📝 Candidate Instructions
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="instructions">📋 Exam Instructions</label>
+                            <textarea id="instructions" name="instructions" rows="6" 
+                                    placeholder="Enter detailed instructions for candidates..."
+                                    >1. Read all questions carefully before starting.
+2. You have the specified time limit to complete all questions.
+3. All questions are mandatory unless stated otherwise.
+4. For multiple choice questions, select only one option.
+5. For essay questions, provide detailed and well-structured answers.
+6. Do not refresh the page during the exam as it may cause data loss.
+7. Contact support immediately if you face any technical issues.</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <div>
+                        <span class="loading" id="loadingText">🤖 Generating questions using AI...</span>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <a href="/admin" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            🚀 Generate Questions & Create Exam
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function updateTotal() {
+            const mcqCount = parseInt(document.getElementById('mcq_count').value) || 0;
+            const mcqMarks = parseInt(document.getElementById('mcq_marks').value) || 0;
+            const shortCount = parseInt(document.getElementById('short_count').value) || 0;
+            const shortMarks = parseInt(document.getElementById('short_marks').value) || 0;
+            const essayCount = parseInt(document.getElementById('essay_count').value) || 0;
+            const essayMarks = parseInt(document.getElementById('essay_marks').value) || 0;
+            
+            const totalQuestions = mcqCount + shortCount + essayCount;
+            const totalMarks = (mcqCount * mcqMarks) + (shortCount * shortMarks) + (essayCount * essayMarks);
+            
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            document.getElementById('totalMarks').textContent = totalMarks;
+            
+            // Validate minimums
+            if (totalQuestions < 1) {
+                document.getElementById('totalQuestions').style.color = '#dc2626';
+            } else {
+                document.getElementById('totalQuestions').style.color = '#059669';
+            }
+        }
+        
+        // Form submission handling
+        document.getElementById('examForm').addEventListener('submit', function(e) {
+            const totalQuestions = parseInt(document.getElementById('totalQuestions').textContent);
+            
+            if (totalQuestions < 1) {
+                e.preventDefault();
+                alert('❌ Please add at least one question to the exam.');
+                return;
+            }
+            
+            // Validate required fields on client side BEFORE disabling anything
+            const title = document.getElementById('title').value.trim();
+            const department = document.getElementById('department').value.trim();
+            const position = document.getElementById('position').value.trim();
+            
+            console.log('Form validation - Title:', title, 'Department:', department, 'Position:', position);
+            
+            if (!title || !department || !position) {
+                e.preventDefault();
+                alert('❌ Please fill in all required fields: Title, Department, and Position.');
+                return;
+            }
+            
+            // Debug: Log form data before submission
+            console.log('=== FORM SUBMISSION DEBUG ===');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ' + value);
+            }
+            console.log('=============================');
+            
+            // Show loading state AFTER validation
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingText = document.getElementById('loadingText');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '🔄 Creating Exam...';
+            loadingText.style.display = 'inline';
+            
+            // DON'T disable form inputs - this prevents data from being sent!
+            // The following line was causing the issue:
+            // const inputs = document.querySelectorAll('input, textarea, select');
+            // inputs.forEach(input => input.disabled = true);
+        });
+        
+        // Auto-save functionality (optional)
+        function autoSave() {
+            const formData = new FormData(document.getElementById('examForm'));
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            localStorage.setItem('exam_draft', JSON.stringify(data));
+        }
+        
+        // Load saved draft
+        function loadDraft() {
+            const saved = localStorage.getItem('exam_draft');
+            if (saved) {
+                const data = JSON.parse(saved);
+                for (let [key, value] of Object.entries(data)) {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = value;
+                    }
+                }
+                updateTotal();
+            }
+        }
+        
+        // Add auto-save on input change
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('change', autoSave);
+            element.addEventListener('input', autoSave);
+        });
+        
+        // Initialize
+        updateTotal();
+        loadDraft();
+        
+        // Clear draft on successful submission
+        window.addEventListener('beforeunload', function() {
+            if (document.getElementById('submitBtn').disabled) {
+                localStorage.removeItem('exam_draft');
+            }
+        });
+        
+        // Validate form inputs
+        function validateForm() {
+            const required = document.querySelectorAll('input[required], textarea[required], select[required]');
+            let isValid = true;
+            
+            required.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#ef4444';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#e1e5e9';
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // Real-time validation
+        document.querySelectorAll('input[required], textarea[required], select[required]').forEach(field => {
+            field.addEventListener('blur', validateForm);
+        });
+        
+        // Character counter for textarea
+        document.getElementById('instructions').addEventListener('input', function() {
+            const maxLength = 1000;
+            const current = this.value.length;
+            const remaining = maxLength - current;
+            
+            if (remaining < 0) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '#e1e5e9';
+            }
+        });
+        
+        // Suggested templates
+        const suggestionTemplates = {
+            'Software Engineer': {
+                title: 'Software Engineer Technical Assessment',
+                description: 'Comprehensive technical evaluation for software engineering positions covering programming concepts, system design, and problem-solving skills.',
+                mcq_count: 15,
+                short_count: 5,
+                essay_count: 2,
+                mcq_marks: 2,
+                short_marks: 8,
+                essay_marks: 15,
+                time_limit: 120
+            },
+            'Data Scientist': {
+                title: 'Data Science Competency Assessment',
+                description: 'Technical assessment focusing on statistical analysis, machine learning, and data interpretation skills.',
+                mcq_count: 12,
+                short_count: 6,
+                essay_count: 2,
+                mcq_marks: 3,
+                short_marks: 7,
+                essay_marks: 20,
+                time_limit: 150
+            },
+            'Marketing Manager': {
+                title: 'Marketing Strategy and Management Assessment',
+                description: 'Evaluation of marketing knowledge, strategic thinking, and campaign management capabilities.',
+                mcq_count: 10,
+                short_count: 8,
+                essay_count: 3,
+                mcq_marks: 2,
+                short_marks: 5,
+                essay_marks: 12,
+                time_limit: 90
+            }
+        };
+        
+        // Quick template application
+        document.getElementById('position').addEventListener('blur', function() {
+            const position = this.value.trim();
+            for (let template in suggestionTemplates) {
+                if (position.toLowerCase().includes(template.toLowerCase())) {
+                    if (confirm(`💡 Would you like to apply the suggested template for ${template}?`)) {
+                        const config = suggestionTemplates[template];
+                        Object.keys(config).forEach(key => {
+                            const element = document.getElementById(key);
+                            if (element) {
+                                element.value = config[key];
+                            }
+                        });
+                        updateTotal();
+                    }
+                    break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

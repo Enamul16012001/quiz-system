@@ -3,11 +3,11 @@ version: '3.8'
 services:
   web:
     build: .
-    container_name: quiz_web
+    container_name: quiz_web_admin
     ports:
-      - "7902:7902"
+      - "7903:7903"
     volumes:
       - .:/app
     environment:
       - PYTHONUNBUFFERED=1
-    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7902"]
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7903"]
